@@ -157,7 +157,7 @@ class ApiClient {
         @Throws(IOException::class)
         override fun convert(value: Any): String {
             val buffer = okio.Buffer()
-            delegate.convert(value).writeTo(buffer)
+            delegate.convert(value)?.writeTo(buffer)
             return when (value) {
                 is Date -> SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(value)
                 is String -> value.toString()
