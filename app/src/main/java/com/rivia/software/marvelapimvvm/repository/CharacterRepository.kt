@@ -5,31 +5,37 @@ import com.rivia.software.marvelapimvvm.repository.model.ErrorMessage
 import com.rivia.software.restmodule.client.ApiWrapper
 import com.rivia.software.restmodule.client.MarvelApi
 import com.rivia.software.restmodule.client.model.Character
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import retrofit2.Response
 
 
 //TODO: Se podría hacer un repository generico para tener el codigo mas limpio y simplificado
 class CharacterRepository(private val api: MarvelApi) {
 
-    suspend fun getCharacters(
+    fun getCharacters(
         nameStartsWith: String?,
-        offset: Int, limit: Int
-    ): DataWrapper<List<Character?>>? {
+        offset: Int,
+        limit: Int,
+        callback: (DataWrapper<List<Character?>>) -> Unit,
+        error: (ErrorMessage) -> Unit
+    ) {
+        GlobalScope.launch(Dispatchers.IO) {
+            try {
+                val dataRequest = ApiWrapper.getCharacters(api, nameStartsWith, offset, limit)
+                if (dataRequest?.isSuccessful!!) {
+                    callback(DataWrapper(dataRequest.body()?.data?.results))
+                } else {
+                    error(ErrorMessage(dataRequest.code(), dataRequest.errorBody().toString()))
+                }
 
-        val dataRequest = ApiWrapper.getCharacters(api, nameStartsWith, offset, limit)
-
-       return try {
-            val response = dataRequest?.await()
-
-
-            if (response?.isSuccessful!!) {
-                DataWrapper(response.body()?.data?.results)
-            } else {
-                DataWrapper(null, ErrorMessage(response.code(),response.errorBody().toString()))
+            } catch (e: java.lang.Exception) {
+                kotlin.error(ErrorMessage(-1, "CRITICAL ERROR"))
             }
-        } catch (e: Exception) {
-            DataWrapper(null, ErrorMessage(null, null,e))
         }
 
     }
+
 
 }

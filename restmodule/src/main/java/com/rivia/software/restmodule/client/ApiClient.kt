@@ -59,7 +59,6 @@ class ApiClient {
         retrofitBuilder = Retrofit.Builder()
             .client(okHttpClient)
             .baseUrl(baseUrl)
-            .addCallAdapterFactory(CoroutineCallAdapterFactory())
             .addConverterFactory(GsonConverterFactory.create(gson))
             .addConverterFactory(DateStringConverterFactory(GsonConverterFactory.create
                 (gson)))

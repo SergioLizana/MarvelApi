@@ -10,12 +10,10 @@ import java.security.MessageDigest
 
 object ApiWrapper {
 
-    fun getCharacters(api: MarvelApi?, nameStartsWith: String?, offset: Int, limit: Int): Deferred<Response<CharacterDataWrapper>>? {
+    suspend fun getCharacters(api: MarvelApi?, nameStartsWith: String?, offset: Int, limit: Int): Response<CharacterDataWrapper>? {
         val timesStamp = System.currentTimeMillis()
         val apikey = "677166c25ed26a4e1b20993a1894761c"
-
-        return api?.getCharacters(timesStamp.toString(),apikey,generateHash(timesStamp),nameStartsWith,offset,limit)
-
+        return api?.getCharacters(timesStamp.toString(),apikey,generateHash(timesStamp),"s",offset,limit)
     }
 
     fun String.md5(): String {

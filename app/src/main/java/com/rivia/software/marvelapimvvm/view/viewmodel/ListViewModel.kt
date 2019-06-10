@@ -24,21 +24,18 @@ class ListViewModel(private val repository: CharacterRepository) : ViewModel(){
     val characterList = MutableLiveData<DataWrapper<List<CharacterListResponse>>>()
 
     fun getCharacterList(){
-        scope.launch {
-            val list = repository.getCharacters("",0,99)
-
-            var characterListResponse: DataWrapper<List<CharacterListResponse>> = DataWrapper(list?.data?.map {
-                        CharacterListResponse(
-                            it?.id,
-                            it?.name,
-                            it?.description,
-                            it?.modified,
-                            it?.thumbnail?.path)
+          repository.getCharacters("",0,99,{ list ->
+              characterList.postValue(DataWrapper(list?.data?.map {
+                  CharacterListResponse(
+                      it?.id,
+                      it?.name,
+                      it?.description,
+                      it?.modified,
+                      it?.thumbnail?.path)
+              }))
+            },{
+              //TODO: Error
             })
-            characterList.postValue(characterListResponse)
-
-
-        }
     }
 
     fun cancelAllRequests() = coroutineContext.cancel()
